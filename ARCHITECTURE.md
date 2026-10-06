@@ -1,12 +1,14 @@
-# Architecture — prototype-v2 building blocks
+# Architecture — prototype building blocks
 
 Multi-page HTML + shared CSS/JS. Each major region uses `data-block="BlockName"` so you can find and relocate pieces without hunting screenshots.
+
+**Prototype versions:** `v2` (full Security→Member) and `v3` (short building-blocks spine). Active version from `?proto=v2|v3` or `localStorage` key `ent-templates-proto-version`. ProtoChrome Back/Next and the demo map read `ProtoState.DEMO_PATH` (getter → `DEMO_PATH_V2` or `DEMO_PATH_V3`).
 
 ## Folder map
 
 ```
 prototype-v2/
-  index.html
+  index.html               # demo map + version switch
   README.md
   ARCHITECTURE.md          ← this file
   css/
@@ -15,9 +17,10 @@ prototype-v2/
     components.css         # all blocks below
     screens.css            # page-specific layouts
   js/
-    state.js               # roles, templates, allowlist, localStorage
-    interactions.js        # ProtoChrome, toasts, modals, role chrome, helpers
-  screens/                 # one HTML file per beat
+    state.js               # roles, versions, templates/blocks, localStorage
+    interactions.js        # ProtoChrome, VersionSwitcher, toasts, modals
+  screens/                 # V2 beats (00–10b)
+  screens/v3/              # V3 short spine (01–09)
   data/                    # reference JSON (mirrored in state.js for file://)
 ```
 
@@ -52,7 +55,17 @@ Index uses `css/` and `js/` without `../`.
 | **CSS** | `[data-block="ProtoChrome"]`, `.proto-chrome__*` in `components.css` |
 | **JS** | `interactions.js` → `injectProtoChrome()` on DOMContentLoaded |
 | **Screens** | All (auto-injected). Skip with `data-no-proto="true"` on `<body>` |
-| **Move/change** | Edit inject HTML in `interactions.js`; styles in `components.css`. Path order: `ProtoState.DEMO_PATH` in `state.js` |
+| **Move/change** | Edit inject HTML in `interactions.js`; styles in `components.css`. Path order: `ProtoState.DEMO_PATH` (version-aware getter). Screen paths under `screens/v3/` use `../../` prefix. |
+
+### VersionSwitcher
+
+| | |
+|--|--|
+| **Purpose** | Switch Full (V2) ↔ Short · building blocks (V3); reloads demo map with `?proto=` |
+| **CSS** | `[data-block="VersionSwitcher"]`, `.version-switcher__*`, `.proto-chrome__version-pill` |
+| **JS** | `ProtoState.getProtoVersion` / `setProtoVersion`; `proto:versionchange` event |
+| **Screens** | ProtoChrome (all) + hero control on `index.html` |
+| **Move/change** | Labels in `PROTO_VERSIONS`; paths in `DEMO_PATH_V2` / `DEMO_PATH_V3`; map sections in `DEMO_MAP_SECTIONS_V2` / `_V3` |
 
 ### RoleSwitcher
 
@@ -61,7 +74,7 @@ Index uses `css/` and `js/` without `../`.
 | **Purpose** | Switch Security / Admin / Builder / Member; updates `body[data-role]` |
 | **CSS** | `[data-block="RoleSwitcher"]`, `.role-switcher__*` |
 | **JS** | `ProtoState.setRole`, `ProtoUI.applyRoleChrome`, `proto:rolechange` event |
-| **Screens** | Injected in ProtoChrome on product screens only (not demo map). Label: “Acting as” + select |
+| **Screens** | Injected in ProtoChrome on product screens only (not demo map). Label: “Acting as” + select. V3 omits Security from the dropdown. |
 | **Move/change** | Role capability flags in `state.js` `ROLES`. Chrome visibility: `.role-hide-member`, `.role-show-submit`, etc. in `components.css`. Product screens may also show `<span data-role-label>` live labels. |
 
 ### AppShell
@@ -111,7 +124,7 @@ Index uses `css/` and `js/` without `../`.
 | **CSS** | `[data-block="AllowlistPanel"]`, `.allowlist-tabs`, `.cap-setup`, `.allowlist-table`, `.badge--allowed\|blocked` |
 | **JS** | `ProtoState.beginBlockReview` → 00b on Block; `toggleNodeAllowed` / `toggleDomainAllowed` on Allow; `suggestFromStackPrompt`, `applyStackSuggestion`; tabs + filters in `00-security-allowlist.html` |
 | **Screens** | 00 |
-| **Move/change** | Seed data: `state.js` `DEFAULT_NODES` (capabilities) + `DEFAULT_DOMAINS` (+ `data/sample-nodes.json`). Storage key `ent-templates-v2-rebuild`. |
+| **Move/change** | Seed data: `state.js` `DEFAULT_NODES` (capabilities) + `DEFAULT_DOMAINS` (+ `data/sample-nodes.json`). Storage key `ent-templates-v2-skills-v1` (V2 only — not on V3 primary path). |
 
 ### ImpactReviewPanel
 
@@ -257,7 +270,7 @@ Index uses `css/` and `js/` without `../`.
 
 | Screen | Blocks |
 |--------|--------|
-| index | ProtoChrome, Button |
+| index | ProtoChrome, VersionSwitcher, Button |
 | 00 | AppShell, SettingsLayout, AllowlistPanel (tools + domains + stack prompt), Button, Toast |
 | 00b | AppShell, SettingsLayout, ImpactReviewPanel, Button, Toast |
 | 00c | AppShell, SettingsLayout, OwnerNotifyPanel, NotificationPreview, Button, Toast |
@@ -272,24 +285,53 @@ Index uses `css/` and `js/` without `../`.
 | 07 | AppShell, AiAssistPanel, TemplateCard, ProvenanceChip, Modal, Button, Toast |
 | 08 | AppShell, WorkflowEditorChrome, ProvenanceChip, Button |
 | 09 | AppShell, McpChatVignette, ProvenanceChip, Button, Toast |
+| 10 | AppShell, LifecycleBanner, SaveSkillForm, Button, Toast |
+| 10b | AppShell, GalleryToolbar, SkillCatalog, SkillCard, ProvenanceChip, Button, Toast |
+| v3/01 | AppShell, SettingsLayout, LibraryEnableToggle, Button, Toast |
+| v3/02 | WorkflowEditorChrome, PolicyRail, NodePalette, LifecycleBanner, Menu, Modal, Toast |
+| v3/03 | AppShell, LifecycleBanner, Button, Toast |
+| v3/04 | AppShell, SettingsLayout, ApprovalQueue, Button, Toast |
+| v3/05 | AppShell, CreateEmptyState, Modal, Button |
+| v3/06 | AppShell, GalleryToolbar, TemplateCard, Button, Toast |
+| v3/07 | AppShell, WorkflowEditorChrome, ProvenanceChip, Button |
+| v3/08 | AppShell, AiAssistPanel, ProvenanceChip, Modal, Button, Toast |
+| v3/09 | AppShell, McpChatVignette, ProvenanceChip, Button, Toast |
 
-*(ProtoChrome + RoleSwitcher on all via injection.)*
+*(ProtoChrome + VersionSwitcher on all; RoleSwitcher on product screens via injection.)*
 
 ## State API (quick)
 
 ```js
+ProtoState.getProtoVersion() // 'v2' | 'v3'
+ProtoState.setProtoVersion('v3', { reload: false })
+ProtoState.DEMO_PATH // getter → DEMO_PATH_V2 or DEMO_PATH_V3
 ProtoState.setRole('member')
-ProtoState.setLibraryEnabled(true) // default true
-ProtoState.templatesForRole('builder') // role-filtered library
-ProtoState.beginBlockReview('capability', 'cap-slack') // → navigate to 00b
+ProtoState.setLibraryEnabled(true) // V2 default true; V3 default false
+ProtoState.templatesForRole('builder') // V2 role-filtered library
+ProtoState.beginBlockReview('capability', 'cap-slack') // V2 → 00b
 ProtoState.getBlockImpact()
-ProtoState.confirmPendingBlock() // applies block + fills lastBlockAction → 00c
-ProtoState.getLastBlockAction()
+ProtoState.confirmPendingBlock() // V2 applies block + fills lastBlockAction → 00c
 ProtoState.submitDraftAsPending({ name, note, owner, contributors, targetGroups })
 ProtoState.updateTemplateStatus(id, 'golden')
-ProtoState.setProvenance({ type: 'library'|'ai'|'mcp', templateId, templateName, owner, contributors })
-ProtoState.reset()
+ProtoState.getBlocks('tool'|'skill'|'agent'|null) // V3
+ProtoState.submitCompanyBlock({ kind, name, description, owner, note })
+ProtoState.updateBlockStatus(id, 'golden')
+ProtoState.ensureDemoBlocks() // V3 seed when jumping to late screens
+ProtoState.insertBlockIntoWorkflow(id)
+ProtoState.setProvenance({ type: 'library'|'ai'|'mcp'|'skill'|'block'|…, … })
+ProtoState.getSkills('skill'|'block'|null)
+ProtoState.saveAsSkillBlock({ kind, name, description, version, owner, inputs, outputs, changelogNote })
+ProtoState.insertSkillIntoWorkflow(id)
+ProtoState.reset() // resets active version’s storage key only
 ```
+
+## Storage keys
+
+| Key | Purpose |
+|-----|---------|
+| `ent-templates-proto-version` | Active prototype version (`v2` / `v3`) |
+| `ent-templates-v2-skills-v1` | V2 session state |
+| `ent-templates-v3-short-v1` | V3 session state (isolated) |
 
 ## Allowlist model (Miro Frame 4 · Capability allow-list)
 
@@ -301,8 +343,9 @@ ProtoState.reset()
 
 ## How to add a screen
 
-1. Copy an existing `screens/*.html` shell.  
-2. Add entry to `ProtoState.DEMO_PATH` in `state.js` (for ProtoChrome Back/Next). Set `role` so it lands in the right demo-map section (`DEMO_MAP_SECTIONS`).  
+1. Copy an existing shell (`screens/*.html` for V2, `screens/v3/*.html` for V3 — note `../../` asset paths in V3).  
+2. Add entry to `DEMO_PATH_V2` or `DEMO_PATH_V3` in `state.js` (for ProtoChrome Back/Next). Set `role` for the right demo-map section (`DEMO_MAP_SECTIONS_V2` / `_V3`).  
 3. Map cards are rendered from `DEMO_PATH` + `DEMO_MAP_SECTIONS` in `index.html` — no hard-coded grid.  
 4. Put `data-block` on major regions; reuse component classes for hover.  
-5. Document the beat in the HTML comment header.
+5. Document the beat in the HTML comment header.  
+6. Bump `?v=` on CSS/JS when publishing so GitHub Pages clients pick up changes.

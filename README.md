@@ -1,8 +1,13 @@
-# Enterprise templates · prototype v2
+# Enterprise templates · prototype
 
-Native HTML/CSS/JS click-through for the n8n **Enterprise case-study** depth bet: private/golden company template library + hard rails (node allowlist, create-vs-copy). Replaces the screenshot+hotspot prototype in `../prototype/` (left intact as reference).
+Native HTML/CSS/JS click-through for the n8n **Enterprise case-study** depth bet. One static site with a **switchable prototype version**:
 
-**Visual language:** n8n-like dark product shell. No PNG backgrounds. No Miro navy/yellow product theme. No Approved Stack light-paper look on product screens.
+| Version | Label | Primary path |
+|---------|--------|--------------|
+| **V2** (default) | Full demo (prior case) | Security allowlist → roles → library → submit/approve → member |
+| **V3** | Short · building blocks | Admin enable → Builder submit block → Approve → Member compose (+ AI/MCP rails) |
+
+**Visual language:** n8n-like dark product shell. No PNG backgrounds. No Miro navy/yellow product theme.
 
 ## Open
 
@@ -10,91 +15,103 @@ Native HTML/CSS/JS click-through for the n8n **Enterprise case-study** depth bet
 open "product work/enterprise templates solution/prototype-v2/index.html"
 ```
 
-Or open `index.html` in any browser (file:// works; no build step).
+Or open `index.html` in any browser (`file://` works; no build step).
+
+Switch versions from the demo map **Prototype version** control, the ProtoChrome **Proto** dropdown, or `?proto=v2` / `?proto=v3`.
+
+## Why two versions
+
+Meeting + deck cut: go deep on **1 Must + 1 Should** rather than four features.
+
+- **Must:** company **building blocks** library (tools / skills / agents)
+- **Should:** **create/copy rules** enforced across **UI, AI, MCP**
+
+Security allowlist depth stays in **V2 only** (struck for the short deep prototype).
 
 ## Roles (demo)
 
-The demo map (`index.html`) groups screens by **job / role** (Miro Frame 5 swimlanes: Security → Admin → Builder → Member). Clicking a card sets that role before opening the screen. The primary path CTA still starts at Security → 00 allowlist; ProtoChrome **Back / Next** keeps journey order (not map section order). Product screens also show **Acting as …**; ProtoChrome keeps a compact **Acting as** dropdown to change persona mid-demo.
+The demo map groups screens by **job / role**. Clicking a card sets that role. ProtoChrome **Back / Next** follows the active version’s path. Product screens show **Acting as …**; ProtoChrome keeps a compact role dropdown.
 
-| Role | Job on the map | Screens |
-|------|----------------|---------|
-| **Security** | Define what builders may use · impact before block · notify owners | `00`, `00b`, `00c` |
-| **Admin** | Assign create vs copy · library · approve | `01`, `01b`, `03b` |
-| **Builder** | Build under rails · submit | `02`, `03`, `04` |
-| **Member** | Copy / modify approved only (AI + MCP) | `05`, `06`, `08` + spurs `07`, `09` |
+| Role | V2 job | V3 job |
+|------|--------|--------|
+| **Security** | Allowlist · impact · notify | *(not in V3 primary path)* |
+| **Admin** | Roles · library · approve templates | Enable blocks library · approve blocks |
+| **Builder** | Build under rails · submit templates | Build under rails · mark company block |
+| **Member** | Copy approved templates (+ AI/MCP) | Compose from approved blocks (+ AI/MCP) |
 
-Role id is `member` (legacy `copy` migrates on load). State persists in `localStorage` (`ent-templates-v2-rebuild`). Use **Reset demo data** on the index map.
+State persists in `localStorage`:
 
-## Primary click path (~90s)
+- V2: `ent-templates-v2-skills-v1`
+- V3: `ent-templates-v3-short-v1` (isolated — resets don’t cross-contaminate)
+- Active version: `ent-templates-proto-version`
 
-1. **00** Set approved capabilities — try **Block** on Slack (or stack prompt / SSH)
-2. **00b** Review workflows that will break — impact count + owners → Confirm block
-3. **00c** Notify owners of blocked capabilities — who was notified + sample copy
-4. **01** Assign who can create vs copy templates — not a paywall
-5. **01b** Turn on the company template library — Settings opt-in
-6. **02** Build a workflow under policy rails — Submit menu; click a **Blocked** palette node → soft-block modal
-7. **03** Submit a workflow as an internal template — ≠ Publish/Unpublish
-8. **03b** Approve a pending internal template — Approve golden / Reject / Request changes
-9. **05** Start from blank or company template (path switches to **Member**) — blank option gone
-10. **06** Pick a golden template from the company library — Use a Golden card
-11. **08** Open the workflow created from a golden template — **Provenance chip**
+Use **Reset demo data** on the index map (resets the **active** version’s key only).
 
-ProtoChrome **Back / Next** follows the full demo path including Browse workflows (04) and spurs.
+## V2 primary click path (~90s)
 
-## Secondary paths
+1. **00** Set approved capabilities — try **Block** on Slack  
+2. **00b** Review workflows that will break → Confirm  
+3. **00c** Notify owners  
+4. **01** Assign create vs copy  
+5. **01b** Company template library  
+6. **02** Build under policy rails  
+7. **03** Submit as internal template (≠ publish)  
+8. **03b** Approve pending → golden  
+9. **05** Create as Member (blank denied)  
+10. **06** Company library → Use  
+11. **08** Result + provenance  
 
-- **AI climax:** from 05 or 06 → **07** Create a workflow from approved templates with AI (match + confirm + trust) → **08**
-- **MCP echo:** **09** Prefer a golden template via MCP → **08** (same rails: golden prefer + allowlist refuse)
+Spurs: **07** AI, **09** MCP, **10** / **10b** skills/blocks.
 
-## Screen list
+## V3 short spine (~60s)
 
-| File | Role section | Beat |
-|------|--------------|------|
-| `index.html` | — | Demo map by job / role + Start primary path |
-| `screens/00-security-allowlist.html` | Security | Capability allowlist (tools + domains) |
-| `screens/00b-block-impact-review.html` | Security | Impact review before block |
-| `screens/00c-block-notify-owners.html` | Security | Notify workflow owners |
-| `screens/01-admin-roles.html` | Admin | Create vs copy assignment |
-| `screens/01b-library-enable.html` | Admin | Opt-in internal library |
-| `screens/02-builder-editor.html` | Builder | Editor + allowlist palette |
-| `screens/03-submit-as-template.html` | Builder | Submit ≠ publish |
-| `screens/03b-approval-queue.html` | Admin | Pending / approve / reject |
-| `screens/04-overview.html` | Builder | Workflow list → create |
-| `screens/05-create-empty.html` | Member | Role-aware create |
-| `screens/06-company-library.html` | Member | Internal SoR + card states |
-| `screens/07-ai-assist.html` | Member (spur) | Approved match + confirm |
-| `screens/08-result.html` | Member | Provenance chip |
-| `screens/09-mcp.html` | Member (spur) | Optional MCP spur |
+1. **V3-01** Enable building-blocks library (empty until approve)  
+2. **V3-02** Build tool/skill/agent under rails (soft-block)  
+3. **V3-03** Mark as company building block — **submit ≠ publish**  
+4. **V3-04** Admin approve → published  
+5. **V3-05** Member create — blank denied (request vs start from block)  
+6. **V3-06** Gallery (empty-state beat + tools/skills/agents)  
+7. **V3-07** Compose canvas + provenance  
+8. **V3-08** AI — only approved blocks / out-of-policy refuse  
+9. **V3-09** MCP — same rails  
 
-## Gaps this fills (vs v1 screenshots)
+### V3 unhappy-path beats
 
-1. Security allowlist admin  
-2. **Block impact review + owner notifications** (before / after disable)  
-3. Admin enable internal library  
-4. Real create vs copy roles (not upgrade CTA)  
-5. Submit as internal ≠ Publish  
-6. Approver queue  
-7. Company library (not public Trending gallery)  
-8. Card states: Draft / Pending / Golden / Archived  
-9. Role chrome variants  
-10. Result provenance chip  
-11. AI assist with approved match + trust copy  
-12. MCP vignette as same-rails echo  
+1. Empty library after enable  
+2. Submit vs publish toast/copy  
+3. Member blank-create modal  
+4. AI/MCP out-of-policy → use company block  
+
+## Screen list (V3)
+
+| File | Beat |
+|------|------|
+| `screens/v3/01-enable-library.html` | Admin enable library |
+| `screens/v3/02-builder-rails.html` | Builder under rails |
+| `screens/v3/03-mark-company-block.html` | Submit ≠ publish |
+| `screens/v3/04-approve-block.html` | Approve pending block |
+| `screens/v3/05-create-workflow.html` | Member create rails |
+| `screens/v3/06-blocks-gallery.html` | Gallery + empty state |
+| `screens/v3/07-compose-canvas.html` | Suggested blocks + provenance |
+| `screens/v3/08-ai-assist.html` | AI approved-only |
+| `screens/v3/09-mcp.html` | MCP same rails |
+
+V2 screens remain under `screens/*.html` (unchanged path).
 
 ## Architecture
 
-See [`ARCHITECTURE.md`](ARCHITECTURE.md) for building blocks, `data-block` attributes, and how to move/change components.
+See [`ARCHITECTURE.md`](ARCHITECTURE.md) for building blocks, version switch, and `data-block` map.
 
 ## Hosted / local
 
-- **Local:** `open "product work/enterprise templates solution/prototype-v2/index.html"` (or any static server).
-- **Repo:** [BobMoonbird/enterprise-templates-proto](https://github.com/BobMoonbird/enterprise-templates-proto)
-- **Live (GitHub Pages):** https://bobmoonbird.github.io/enterprise-templates-proto/
-- Source of truth remains this folder; the GitHub repo is a publish mirror for hosting.
+- **Local:** open `index.html` (or any static server).
+- **Primary Pages:** https://bobmoonbird.github.io/enterprise-templates-prototype/
+- **Board embed mirror:** https://bobmoonbird.github.io/enterprise-templates-proto/
+- Repos: [enterprise-templates-prototype](https://github.com/BobMoonbird/enterprise-templates-prototype) · [enterprise-templates-proto](https://github.com/BobMoonbird/enterprise-templates-proto)
+- Source of truth: this workspace folder; GitHub repos are publish mirrors.
 
 ## Fake data
 
-- `data/sample-templates.json` — golden / pending / archived / draft  
-- `data/sample-nodes.json` — allowlisted + blocked nodes + role defs  
-- Runtime copies live in `js/state.js` (loaded without fetch so `file://` works)
-- `BLOCK_IMPACT` in `state.js` — fake workflows/owners for block review
+- Runtime seeds in `js/state.js` (`DEFAULT_TEMPLATES`, `DEFAULT_SKILLS`, `DEFAULT_V3_BLOCKS`, allowlist, `BLOCK_IMPACT`)
+- Reference JSON in `data/` (mirrored for `file://`)
+- V3 defaults start with an **empty** published catalog so the empty-library beat works; late screens call `ensureDemoBlocks()` when jumping ahead
